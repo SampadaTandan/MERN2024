@@ -41,4 +41,39 @@ const register = async (req, res) => {
     }
 };
 
-module.exports = { home, register };
+//login
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ msg: "Email and password are required" });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    // Validate password
+    const isValidPassword = await user.generateToken(password);
+    if (!isValidPassword) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+
+    // Generate token
+    const token = user.generateToken();
+    return res.status(200).json({
+      msg: "Login successful",
+      token: token,
+      userId: user._id.toString(),
+    });
+  } catch (error) {
+    console.error("Login Error:", error); // Log error for debugging
+    return res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+module.exports = { home, register, login };
