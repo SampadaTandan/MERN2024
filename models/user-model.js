@@ -33,7 +33,7 @@ userSchema.pre("save", async function(next){
     if(!user.isModified('password')){
         next();
     }
-    try {
+    try { 
         const saltRound = await bcrypt.genSalt(10);
         const hash_password = await bcrypt.hash(user.password, saltRound);
         user.password = hash_password;
@@ -60,6 +60,12 @@ userSchema.methods.generateToken = function(){
         console.error(error)
     }
 }
+
+// userSchema.methods.comparePassword = async function (password){
+//     return bcrypt.compare(password, this.password)
+// }
+
+
 //define the model or the collection name
 const User = new mongoose.model("User",userSchema)
 module.exports = User;
